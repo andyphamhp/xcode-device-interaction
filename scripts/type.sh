@@ -1,9 +1,9 @@
 #!/bin/zsh
 # Usage: type.sh "<text>"   — sets the text of the focused field (tap it first) and fires textDidChange.
-# Env: XMCP_APP (bundle id of the app under test, required).
+# Env: XMCP_APP (bundle id of the app under test, required); XMCP_UDID (simulator, default: booted).
 APP=${XMCP_APP:?set XMCP_APP to the app bundle id}
 TEXT="$1"
-PID=$(xcrun simctl spawn booted launchctl list 2>/dev/null | awk -v a="$APP" '$3 ~ a {print $1}' | head -1)
+PID=$(xcrun simctl spawn "${XMCP_UDID:-booted}" launchctl list 2>/dev/null | awk -v a="$APP" '$3 ~ a {print $1}' | head -1)
 [ -z "$PID" ] || [ "$PID" = "-" ] && { echo "app $APP is not running"; exit 1; }
 ESCAPED=$(printf '%s' "$TEXT" | sed 's/\\/\\\\/g; s/"/\\"/g')
 FR='[[[UIApplication sharedApplication] keyWindow] performSelector:@selector(firstResponder)]'
